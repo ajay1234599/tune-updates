@@ -111,6 +111,11 @@ main > .page{animation:fade .25s ease}
 .row.dling .dlic.spin{display:inline-block;border:2px solid var(--fill2);border-top-color:var(--accent);border-radius:50%;animation:rot .8s linear infinite}
 @keyframes rot{to{transform:rotate(360deg)}}
 .pill.icon{min-width:0;padding:11px 14px}
+.ll{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#7a5a00;background:linear-gradient(135deg,#ffe08a,#f5c542);border-radius:4px;padding:1px 5px;margin-right:6px;vertical-align:1px}
+.importcard{display:flex;gap:14px;align-items:center;padding:16px;border-radius:14px;background:var(--fill);margin-bottom:18px}
+.importcard .ic{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;font-size:24px;color:#fff;background:linear-gradient(135deg,#f5c542,#ff9500);flex:none}
+.importcard .tx{flex:1;min-width:0;font-size:13px;color:var(--muted);line-height:1.4}
+.importcard .tx b{display:block;color:var(--text);font-size:16px}
 .yt{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:#fff;background:#e5202e;border-radius:4px;padding:1px 5px;margin-right:6px;vertical-align:1px}
 .eq{position:absolute;left:8px;top:6px;width:48px;height:48px;border-radius:6px;background:rgba(0,0,0,.45);align-items:flex-end;justify-content:center;gap:3px;padding-bottom:15px}
 .eq i{width:3px;background:#fff;border-radius:2px;animation:eq .9s ease-in-out infinite}
@@ -134,7 +139,7 @@ main > .page{animation:fade .25s ease}
 
 /* library segmented control */
 .seg{display:inline-flex;background:var(--fill);border-radius:9px;padding:2px;margin-bottom:18px}
-.seg button{padding:6px 18px;border-radius:7px;font-size:13px;font-weight:600;color:var(--muted)}
+.seg button{padding:6px 16px;border-radius:7px;font-size:13px;font-weight:600;color:var(--muted);white-space:nowrap}
 .seg button.on{background:var(--raised);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.12)}
 
 /* search */
@@ -307,6 +312,8 @@ input[type=range]:hover::-webkit-slider-thumb,input[type=range]:active::-webkit-
   .hero .by{font-size:20px}
   .btns{justify-content:center;width:100%}
   .btns .pill{flex:1;min-width:0}
+  .seg{display:flex;width:100%}
+  .seg button{flex:1;padding:6px 4px}
   .tabbar{display:flex;position:fixed;left:0;right:0;bottom:0;height:calc(var(--tab-h) + var(--sb));padding-bottom:var(--sb);background:var(--barbg);backdrop-filter:saturate(180%) blur(24px);-webkit-backdrop-filter:saturate(180%) blur(24px);border-top:.5px solid var(--sep);z-index:6}
   .tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:10px;font-weight:500;color:var(--muted)}
   .tabbar svg{font-size:24px}
@@ -435,6 +442,8 @@ input[type=range]:hover::-webkit-slider-thumb,input[type=range]:active::-webkit-
 <script>
 const APP = window.TuneApp || null; // set when running inside the iPhone app
 const DL = APP?.downloads?.enabled ? APP.downloads : null; // offline downloads (iPhone app only)
+const LOCAL = APP?.local?.enabled ? APP.local : null;     // My Files: your own imported music
+const qualityLabel = t => [t.codec + (t.lossless ? ' LOSSLESS' : ''), t.bits ? t.bits + '-BIT' : '', t.rate ? +(t.rate / 1000).toFixed(1) + ' KHZ' : '', !t.lossless && t.kbps ? t.kbps + ' KBPS' : ''].filter(Boolean).join(' · ');
 const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
 const view = $('#view'), audio = APP ? APP.audio : $('#audio');
@@ -484,7 +493,7 @@ function playList(list, start = 0, autoplayRadio = true) {
   queue = list.slice(); idx = start; load(); if (autoplayRadio && list.length < 5) extendWithRadio();
 }
 async function extendWithRadio() {
-  const seed = queue[queue.length - 1] || cur(); if (!seed || fetchingMore) return;
+  const seed = queue[queue.length - 1] || cur(); if (!seed || seed.local || fetchingMore) return;
   fetchingMore = true;
   try {
     const recs = await api('/api/radio/' + seed.id);
@@ -509,7 +518,8 @@ function showTrack() {
   $('#npT').textContent = t.title; $('#npA').textContent = t.artist;
   document.title = `${t.title} · ${t.artist}`;
   $('#qual').textContent = '…';
-  api('/api/info/' + t.id + FMT).then(i => $('#qual').textContent = `${(i.codec||'').toUpperCase()} ${i.kbps} KBPS`).catch(() => $('#qual').textContent = '—');
+  if (t.local) $('#qual').textContent = qualityLabel(t);
+  else api('/api/info/' + t.id + FMT).then(i => $('#qual').textContent = `${(i.codec||'').toUpperCase()} ${i.kbps} KBPS`).catch(() => $('#qual').textContent = '—');
   recent = [t, ...recent.filter(x => x.id !== t.id)].slice(0, 60); store.set('recent', recent);
   syncLikeNow(); renderQueue(); markCurrent();
   loadLyrics(); // always, so the live line and lyrics are ready
@@ -517,7 +527,7 @@ function showTrack() {
     navigator.mediaSession.metadata = new MediaMetadata({ title: t.title, artist: t.artist, album: t.album || '', artwork: t.art ? [{ src: abs(t.art), sizes: '544x544' }] : [] });
   }
   if (queue.length - idx < 4) extendWithRadio();
-  const n = queue[idx + 1]; if (n && !APP) fetch('/api/info/' + n.id + FMT).catch(() => {}); // warm up next song
+  const n = queue[idx + 1]; if (n && !APP && !n.local) fetch('/api/info/' + n.id + FMT).catch(() => {}); // warm up next song
 }
 function next(auto = false) {
   if (auto && repeat) { audio.currentTime = 0; audio.play(); return; }
@@ -652,8 +662,9 @@ function openMenu(t, fromNP = false) {
     !fromNP && ['Play Later', ICON.later, () => addLater(t)],
     [isLiked(t.id) ? 'Remove from Loved' : 'Love', ICON.heart, () => toggleLike(t)],
     fromNP && ['View Lyrics', '<svg viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-6l-5 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm3 5v2h10V9zm0 4v2h7v-2z"/></svg>', () => setNPView('lyrics')],
-    ['Create Station', ICON.radio, () => startRadio(t)],
-    DL && (DL.has(t.id) ? ['Remove Download', ICON.trash, () => DL.remove(t.id)]
+    !t.local && ['Create Station', ICON.radio, () => startRadio(t)],
+    t.local && LOCAL && ['Remove from Pulse', ICON.trash, () => LOCAL.remove(t.id)],
+    !t.local && DL && (DL.has(t.id) ? ['Remove Download', ICON.trash, () => DL.remove(t.id)]
                         : DL.progress(t.id) == null && ['Download', ICON.download, () => { DL.download(t); toast('Downloading…', ICON.download); }]),
   ].filter(Boolean);
   $('#sheet').innerHTML = `<div class="box"><div class="head"><img src="${esc(sm(t.art))}" alt=""><div style="min-width:0"><div class="t">${esc(t.title)}</div><div class="a">${esc(t.artist)}</div></div></div>
@@ -683,6 +694,11 @@ if (!APP && 'mediaSession' in navigator) {
 const lists = {}, cards = {};
 const dlClass = id => !DL ? '' : DL.has(id) ? ' dl' : DL.progress(id) != null ? ' dling' : '';
 const mb = b => b > 1e9 ? (b / 1e9).toFixed(1) + ' GB' : Math.max(1, Math.round(b / 1e6)) + ' MB';
+window.onLocalChanged = (state, n) => {
+  if (state === 'start') toast(`Importing ${n} file${n === 1 ? '' : 's'}…`, ICON.download);
+  if (state === 'done') toast(n ? `Imported ${n} song${n === 1 ? '' : 's'}` : 'Those files couldn’t be played', n ? ICON.check : '');
+  if (onPage('library', 'recent') && libTab === 'files') renderLib();
+};
 window.onDownloadsChanged = (id, state) => {
   $$(`.row[data-id="${CSS.escape(id)}"]`).forEach(r => { r.classList.toggle('dl', DL.has(id)); r.classList.toggle('dling', DL.progress(id) != null); });
   if (state === 'failed') toast('Download failed');
@@ -700,7 +716,7 @@ function rows(list, { numbered = false, single = false } = {}) {
       <span class="n">${i + 1}</span>
       <img decoding="async" loading="lazy" src="${esc(sm(t.art))}" alt="">
       <span class="eq"><i></i><i></i><i></i></span>
-      <div style="min-width:0"><div class="rt">${esc(t.title)}</div><div class="ra"><svg class="dlic ok" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm-1 5v6.2L8.4 10.6 7 12l5 5 5-5-1.4-1.4-2.6 2.6V7z"/></svg><span class="dlic spin"></span>${t.source === 'youtube' ? '<span class="yt">YouTube</span>' : ''}${esc(t.artist)}</div></div>
+      <div style="min-width:0"><div class="rt">${esc(t.title)}</div><div class="ra"><svg class="dlic ok" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm-1 5v6.2L8.4 10.6 7 12l5 5 5-5-1.4-1.4-2.6 2.6V7z"/></svg><span class="dlic spin"></span>${t.lossless ? '<span class="ll">Lossless</span>' : ''}${t.source === 'youtube' ? '<span class="yt">YouTube</span>' : ''}${esc(t.artist)}</div></div>
       <div class="al">${esc(t.album || (t.views ? t.views + ' views' : ''))}</div>
       <button class="ib heart ${isLiked(t.id) ? 'on' : ''}" data-id="${esc(t.id)}" aria-label="Love">${ICON.heart}</button>
       <button class="ib more" aria-label="More">${ICON.more}</button>
@@ -848,17 +864,23 @@ async function doSearch(q) {
 let libTab = 'songs';
 function renderLib() {
   if (libTab === 'downloads' && !DL) libTab = 'songs';
-  const list = libTab === 'songs' ? liked : libTab === 'downloads' ? DL.list() : recent;
+  if (libTab === 'files' && !LOCAL) libTab = 'songs';
+  const list = libTab === 'songs' ? liked : libTab === 'downloads' ? DL.list() : libTab === 'files' ? LOCAL.list() : recent;
   const empty = libTab === 'songs'
     ? '<div class="empty"><b>No Loved Songs yet</b>Tap ♥ on any song to save it here.</div>'
+    : libTab === 'files'
+    ? ''
     : libTab === 'downloads'
     ? '<div class="empty"><b>No downloads yet</b>Tap ••• on any song and choose Download to listen without internet.</div>'
     : '<div class="empty"><b>Nothing played yet</b>Songs you play will appear here.</div>';
   view.innerHTML = page(`<div class="lt">Library</div>
-    <div class="seg"><button data-t="songs" class="${libTab === 'songs' ? 'on' : ''}">Loved Songs</button><button data-t="recent" class="${libTab === 'recent' ? 'on' : ''}">Recent</button>${DL ? `<button data-t="downloads" class="${libTab === 'downloads' ? 'on' : ''}">Downloaded</button>` : ''}</div>
+    <div class="seg"><button data-t="songs" class="${libTab === 'songs' ? 'on' : ''}">Loved</button><button data-t="recent" class="${libTab === 'recent' ? 'on' : ''}">Recent</button>${DL ? `<button data-t="downloads" class="${libTab === 'downloads' ? 'on' : ''}">Downloads</button>` : ''}${LOCAL ? `<button data-t="files" class="${libTab === 'files' ? 'on' : ''}">My Files</button>` : ''}</div>
+    ${libTab === 'files' ? `<button class="importcard" id="imp" style="width:100%;text-align:left"><span class="ic"><svg viewBox="0 0 24 24"><path d="M12 3 7 8l1.4 1.4L11 6.8V16h2V6.8l2.6 2.6L17 8zM5 18h14v2H5z"/></svg></span>
+      <span class="tx"><b>Import from Files</b>Add music you own — FLAC, ALAC, WAV, AIFF, MP3 or AAC. Lossless files play at full quality, untouched.</span></button>` : ''}
     ${list.length ? `<div class="btns" style="margin:0 0 18px"><button class="pill" id="pa"><svg viewBox="0 0 24 24">${ICON.play}</svg>Play</button><button class="pill" id="sa"><svg viewBox="0 0 24 24"><path d="M14.8 4H20v5.2l-1.9-1.9L5.4 20 4 18.6 16.7 5.9zM4 5.4 5.4 4l5.1 5.1-1.4 1.4zm11.2 10.2 1.4-1.4 1.5 1.5L20 14v6h-6l1.8-1.8z"/></svg>Shuffle</button>${DL && libTab === 'songs' ? `<button class="pill icon" id="dla" aria-label="Download all">${ICON.download}</button>` : ''}</div>` : ''}
     ${rows(list) || empty}
-    ${list.length ? `<div class="foot">${list.length} song${list.length === 1 ? '' : 's'} · ${libTab === 'downloads' ? mb(DL.bytes()) + ' on this iPhone · plays without internet' : 'stored only on this device'}</div>` : ''}`);
+    ${list.length ? `<div class="foot">${list.length} song${list.length === 1 ? '' : 's'} · ${libTab === 'downloads' ? mb(DL.bytes()) + ' on this iPhone · plays without internet' : libTab === 'files' ? list.filter(t => t.lossless).length + ' lossless · played at original quality' : 'stored only on this device'}</div>` : ''}`);
+  const imp = $('#imp'); if (imp) imp.onclick = () => LOCAL.importFiles();
   const dla = $('#dla'); if (dla) dla.onclick = async () => { const n = await DL.downloadMany(liked); toast(n ? `Downloading ${n} song${n === 1 ? '' : 's'}…` : 'All Loved Songs are downloaded', ICON.download); };
   $$('.seg button').forEach(b => b.onclick = () => { libTab = b.dataset.t; renderLib(); });
   if (list.length) { $('#pa').onclick = () => playList(list, 0, false); $('#sa').onclick = () => playList([...list].sort(() => Math.random() - .5), 0, false); }

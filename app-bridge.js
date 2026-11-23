@@ -56,7 +56,7 @@
   const dlState = {}, pending = {}, dlRetried = new Set();
   const notify = (id, state) => { try { window.onDownloadsChanged?.(id, state); } catch (e) { console.error(e); } };
   async function download(t) {
-    if (!canDownload || present.has(t.id) || t.id in dlState) return;
+    if (!canDownload || t.local || present.has(t.id) || t.id in dlState) return;
     dlState[t.id] = 0; pending[t.id] = t; notify(t.id, 'start');
     try {
       const s = await E.stream(t.id);
@@ -64,7 +64,7 @@
     } catch { delete dlState[t.id]; notify(t.id, 'failed'); }
   }
   async function downloadMany(list) { // two at a time, skipping ones already saved
-    const todo = list.filter(t => !present.has(t.id) && !(t.id in dlState));
+    const todo = list.filter(t => !t.local && !present.has(t.id) && !(t.id in dlState));
     for (const t of todo) { download(t); while (Object.keys(dlState).length >= 2) await new Promise(r => setTimeout(r, 400)); }
     return todo.length;
   }
@@ -98,10 +98,37 @@
     download, downloadMany, remove: removeDownload,
   };
 
-  const item = (t, s) => present.has(t.id)
+  // ---- My Files: your own imported music (native shell v3+) ----
+  const canImport = (window.TUNE_NATIVE || 0) >= 3;
+  const localPresent = new Set(window.__TUNE_LOCAL || []);
+  let localList = store.get('local', []).filter(t => localPresent.has(t.id));
+  const notifyLocal = (state, n) => { try { window.onLocalChanged?.(state, n); } catch (e) { console.error(e); } };
+  function onImported(ev) {
+    if (ev.state === 'start') return notifyLocal('start', ev.count);
+    if (ev.state === 'done') {
+      (ev.tracks || []).forEach(t => localPresent.add(t.id));
+      localList = [...(ev.tracks || []), ...localList]; store.set('local', localList);
+      return notifyLocal('done', (ev.tracks || []).length);
+    }
+    if (ev.state === 'removed') {
+      localPresent.delete(ev.id); localList = localList.filter(t => t.id !== ev.id); store.set('local', localList);
+      notifyLocal('removed', 1);
+    }
+  }
+  const local = {
+    enabled: canImport,
+    list: () => localList.slice(),
+    has: id => localPresent.has(id),
+    importFiles: () => native.player.postMessage({ cmd: 'importFiles' }),
+    remove: id => native.player.postMessage({ cmd: 'deleteLocal', id }),
+  };
+
+  const item = (t, s) => t.local
+    ? { id: t.id, url: 'tune-local://' + t.id, title: t.title, artist: t.artist || '', album: t.album || '', art: t.art || '' } // your own file, untouched
+    : present.has(t.id)
     ? { id: t.id, url: 'tune-dl://' + t.id, title: t.title, artist: t.artist || '', album: t.album || '', art: 'dl/' + t.id + '.jpg' } // plays offline
     : { id: t.id, url: s.url, title: t.title, artist: t.artist || '', album: t.album || '', art: t.art || '' };
-  const resolve = async t => (present.has(t.id) ? null : E.stream(t.id));
+  const resolve = async t => (t.local || present.has(t.id) ? null : E.stream(t.id));
   let gen = 0, upGen = 0, retried = new Set();
 
   async function start() {
@@ -141,6 +168,7 @@
       }
       case 'queueEnd': next(); break;
       case 'download': onDownload(ev); break;
+      case 'imported': onImported(ev); break;
       case 'remote': if (ev.cmd === 'prev') prev(); else if (ev.cmd === 'next') next(); break;
       case 'error': {
         const t = cur();
@@ -155,7 +183,7 @@
 
   window.TuneApp = {
     api: p => E.handle(p),
-    store, audio, start, syncUpcoming, onNative, downloads,
+    store, audio, start, syncUpcoming, onNative, downloads, local,
     setRepeat: on => native.player.postMessage({ cmd: 'repeat', on }),
   };
 })();
