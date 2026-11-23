@@ -165,11 +165,6 @@ main > .page{animation:fade .25s ease}
 .fcard .box .cap{position:absolute;left:0;right:0;bottom:0;padding:14px 16px;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.55))}
 .fcard .box .cap .t{font-weight:700;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .fcard .box .cap .s{font-size:13px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.banner{position:relative;border-radius:16px;overflow:hidden;padding:22px 20px;margin:4px 0 8px;color:#fff;background:linear-gradient(135deg,#ff2d55,#ff9500 55%,#ffcc00)}
-.banner h3{font-size:24px;font-weight:800;letter-spacing:-.02em}
-.banner p{opacity:.9;font-size:14px;margin-top:4px;max-width:420px}
-.banner .btns{margin-top:14px}
-.banner .pill{background:rgba(255,255,255,.95);color:#e5202e}
 /* lyrics */
 .np .lyrics{display:none;flex:1;min-height:0;overflow-y:auto;margin:14px -6px 6px;padding:20px 6px 40vh;scroll-behavior:smooth;-webkit-mask-image:linear-gradient(transparent,#000 8%,#000 80%,transparent);mask-image:linear-gradient(transparent,#000 8%,#000 80%,transparent)}
 .np.showly .stage,.np.showly .queue{display:none}
@@ -350,7 +345,6 @@ input[type=range]:hover::-webkit-slider-thumb,input[type=range]:active::-webkit-
     <div class="sfield" data-go="search"><svg viewBox="0 0 24 24"><path d="M10 2a8 8 0 0 1 6.3 12.9l5.4 5.4-1.4 1.4-5.4-5.4A8 8 0 1 1 10 2zm0 2a6 6 0 1 0 0 12 6 6 0 0 0 0-12z"/></svg>Search</div>
     <button class="nav" data-go="home"><svg viewBox="0 0 24 24"><path d="M12 3 2.5 11.2l1.3 1.5L5 11.7V21h5.5v-6h3v6H19v-9.3l1.2 1 1.3-1.5z"/></svg>Home</button>
     <button class="nav" data-go="new"><svg viewBox="0 0 24 24"><path d="m12 2 2.4 6.2L21 9l-5 4.4L17.5 20 12 16.6 6.5 20 8 13.4 3 9l6.6-.8z"/></svg>New</button>
-    <button class="nav" data-go="telugu"><svg viewBox="0 0 24 24"><path d="M20 3v12.5a3.5 3.5 0 1 1-2-3.2V7.3l-9 1.9v8.3a3.5 3.5 0 1 1-2-3.2V5z"/></svg>Telugu Beats</button>
     <div class="grp">Library</div>
     <button class="nav" data-go="library"><svg viewBox="0 0 24 24"><path d="M12 21.4 10.6 20C5.4 15.4 2 12.3 2 8.5 2 5.4 4.4 3 7.5 3c1.7 0 3.4.8 4.5 2.1A6 6 0 0 1 16.5 3C19.6 3 22 5.4 22 8.5c0 3.8-3.4 6.9-8.6 11.5z"/></svg>Loved Songs</button>
     <button class="nav" data-go="recent"><svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l4 4 4-4H6a7 7 0 1 1 2 4.9l-1.4 1.4A9 9 0 1 0 13 3zm-1 5v5l4.3 2.5.7-1.2-3.5-2.1V8z"/></svg>Recently Played</button>
@@ -362,7 +356,6 @@ input[type=range]:hover::-webkit-slider-thumb,input[type=range]:active::-webkit-
   <nav class="tabbar">
     <button data-go="home"><svg viewBox="0 0 24 24"><path d="M12 3 2.5 11.2l1.3 1.5L5 11.7V21h5.5v-6h3v6H19v-9.3l1.2 1 1.3-1.5z"/></svg>Home</button>
     <button data-go="new"><svg viewBox="0 0 24 24"><path d="m12 2 2.4 6.2L21 9l-5 4.4L17.5 20 12 16.6 6.5 20 8 13.4 3 9l6.6-.8z"/></svg>New</button>
-    <button data-go="telugu"><svg viewBox="0 0 24 24"><path d="M20 3v12.5a3.5 3.5 0 1 1-2-3.2V7.3l-9 1.9v8.3a3.5 3.5 0 1 1-2-3.2V5z"/></svg>Telugu</button>
     <button data-go="library"><svg viewBox="0 0 24 24"><path d="M4 3h3v18H4zm5 0h3v18H9zm5.2.6 2.9-.8 4.6 17.4-2.9.8z"/></svg>Library</button>
     <button data-go="search"><svg viewBox="0 0 24 24"><path d="M10 2a8 8 0 0 1 6.3 12.9l5.4 5.4-1.4 1.4-5.4-5.4A8 8 0 1 1 10 2zm0 2a6 6 0 1 0 0 12 6 6 0 0 0 0-12z"/></svg>Search</button>
   </nav>
@@ -404,7 +397,7 @@ input[type=range]:hover::-webkit-slider-thumb,input[type=range]:active::-webkit-
     <div class="stage"><img class="art" id="npArt" alt=""></div>
     <div class="queue" id="npQueue">
       <h3>Up Next <span class="toggles"><button id="qShuf" title="Shuffle"><svg viewBox="0 0 24 24"><path d="M14.8 4H20v5.2l-1.9-1.9L5.4 20 4 18.6 16.7 5.9zM4 5.4 5.4 4l5.1 5.1-1.4 1.4zm11.2 10.2 1.4-1.4 1.5 1.5L20 14v6h-6l1.8-1.8z"/></svg></button><button id="qRep" title="Repeat"><svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2z"/></svg></button></span></h3>
-      <div class="qsub">Autoplay continues with similar songs</div>
+      <div class="qsub">Autoplay · YouTube Music’s mix for this song</div>
       <div class="list" id="qList"></div>
     </div>
     <div class="lyrics" id="npLyrics"></div>
@@ -487,19 +480,36 @@ function toast(m, icon = '') { const t = $('#toast'); t.innerHTML = icon + esc(m
 
 // ---- player state ----
 let queue = [], idx = -1, shuffle = false, repeat = false, fetchingMore = false;
+let radioSeed = null, radioCont = null; // the YouTube mix currently feeding Up Next
 const cur = () => queue[idx];
 
 function playList(list, start = 0, autoplayRadio = true) {
-  queue = list.slice(); idx = start; load(); if (autoplayRadio && list.length < 5) extendWithRadio();
+  queue = list.slice(); idx = start; radioSeed = radioCont = null;
+  load(); if (autoplayRadio && list.length < 5) extendWithRadio();
 }
+// Keeps Up Next going the way YouTube Music does: start the mix of the song you picked (or the
+// last song of an album/playlist), then keep loading more pages of that same mix. Only when
+// YouTube's mix runs out does it start a new mix from the last song.
 async function extendWithRadio() {
-  const seed = queue[queue.length - 1] || cur(); if (!seed || seed.local || fetchingMore) return;
+  if (fetchingMore) return;
   fetchingMore = true;
   try {
-    const recs = await api('/api/radio/' + seed.id);
-    const have = new Set(queue.map(t => t.id));
-    queue.push(...recs.filter(t => !have.has(t.id)));
-    renderQueue(); APP?.syncUpcoming();
+    for (let tries = 0; tries < 3; tries++) {
+      let path;
+      if (radioSeed && radioCont) path = `/api/radio/${encodeURIComponent(radioSeed)}?cont=${encodeURIComponent(radioCont)}`;
+      else {
+        const seed = (radioSeed || queue.length >= 5 ? queue[queue.length - 1] : queue[0]) || cur();
+        if (!seed || seed.local) return;
+        radioSeed = seed.id; path = '/api/radio/' + encodeURIComponent(seed.id);
+      }
+      const r = await api(path);
+      const recs = Array.isArray(r) ? r : (r.tracks || []);
+      radioCont = Array.isArray(r) ? null : (r.cont || null);
+      const have = new Set(queue.map(t => t.id));
+      const fresh = recs.filter(t => !have.has(t.id));
+      if (fresh.length) { queue.push(...fresh); renderQueue(); APP?.syncUpcoming(); return; }
+      if (!radioCont) radioSeed = null; // mix exhausted → next try starts a new mix from the last song
+    }
   } catch {} finally { fetchingMore = false; }
 }
 function insertNext(t) { if (!cur()) return playList([t]); queue.splice(idx + 1, 0, { ...t }); renderQueue(); APP?.syncUpcoming(); toast('Playing Next', ICON.check); }
@@ -734,7 +744,7 @@ view.addEventListener('click', e => {
   const c = e.target.closest('.card');
   if (c) { const it = cards[c.dataset.k]; if (it.kind === 'song') playList([it], 0); else location.hash = `#/${it.kind}/${encodeURIComponent(it.id)}`; }
   const tile = e.target.closest('.tile');
-  if (tile) { if (tile.dataset.go2) location.hash = '#/' + tile.dataset.go2; else { lastQ = tile.dataset.q; renderSearch(); } }
+  if (tile) { lastQ = tile.dataset.q; renderSearch(); }
 });
 view.addEventListener('contextmenu', e => { const row = e.target.closest('.row'); if (row) { e.preventDefault(); const { list } = lists[row.parentElement.dataset.list]; openMenu(list[+row.dataset.i]); } });
 function cardHtml(it) {
@@ -761,31 +771,10 @@ async function loadFeeds() {
     homeAt = exploreCache.trending.length && exploreCache.releases.length ? Date.now() : 0;
   }
 }
-let teluguCache = null, teluguAt = 0;
-async function loadTelugu() {
-  if (!teluguCache || Date.now() - teluguAt > HOME_TTL) { teluguCache = await api('/api/telugu'); teluguAt = Date.now(); }
-  return teluguCache;
-}
 function featCard(it, kicker) {
   const k = 'C' + (++listSeq); cards[k] = it;
   return `<button class="card fcard" data-k="${k}"><div class="k">${esc(kicker)}</div><div class="box"><img class="bgi" src="${esc(it.art)}" alt=""><img class="cov" decoding="async" src="${esc(it.art)}" alt="">
     <div class="cap"><div class="t">${esc(it.title)}</div><div class="s">${esc(it.artist)}</div></div></div></button>`;
-}
-async function renderTelugu() {
-  if (!teluguCache) view.innerHTML = page(`<div class="lt">Telugu Beats</div>${skRows(5)}${skShelf(6)}`);
-  try {
-    const t = await loadTelugu();
-    if (!onPage('telugu')) return;
-    let html = `<div class="lt">Telugu Beats</div>
-      <div class="banner"><h3>తెలుగు · Telugu Beats</h3><p>Latest hits, mass beats, melodies, folk and evergreen songs — always fresh from YouTube Music.</p>
-      <div class="btns" style="justify-content:flex-start"><button class="pill" id="tPlay"><svg viewBox="0 0 24 24">${ICON.play}</svg>Play Latest</button></div></div>`;
-    if (t.songs.length) html += head('Top Telugu Songs', '<button id="tAll">Play All</button>') + rows(t.songs.slice(0, 10));
-    for (const sh of t.shelves) html += head(esc(sh.title)) + `<div class="shelf">${sh.items.map(cardHtml).join('')}</div>`;
-    view.innerHTML = page(html);
-    const play = () => playList(t.songs, 0);
-    $('#tPlay').onclick = play; const ta = $('#tAll'); if (ta) ta.onclick = play;
-    markCurrent();
-  } catch { view.innerHTML = page('<div class="lt">Telugu Beats</div>' + offlineMsg()); }
 }
 async function renderHome() {
   if (!homeCache) view.innerHTML = page(`<div class="lt">Home</div>${skShelf(6)}${head('Trending Now')}${skRows(4)}`);
@@ -795,7 +784,6 @@ async function renderHome() {
     let html = '<div class="lt">Home</div>';
     const picks = [...exploreCache.releases.slice(0, 4).map(x => [x, 'New Release']), ...(homeCache[0]?.items || []).filter(x => x.kind !== 'song').slice(0, 3).map(x => [x, homeCache[0].title])];
     if (picks.length) html += head('Top Picks', '', true) + `<div class="feat">${picks.map(([x, k]) => featCard(x, k)).join('')}</div>`;
-    html += `<div id="teluguShelf"></div>`;
     if (recent.length) html += head('Recently Played', '<a href="#/recent">See All</a>') + '<div class="shelf">' + recent.slice(0, 12).map(t => cardHtml({ ...t, kind: 'song' })).join('') + '</div>';
     if (exploreCache.releases.length) html += head('New Releases', `<a href="#/new">See All ${ICON.chev}</a>`, !recent.length) + '<div class="shelf">' + exploreCache.releases.slice(0, 12).map(cardHtml).join('') + '</div>';
     if (exploreCache.trending.length) html += head('Trending Now', '<button id="playTrend">Play All</button>') + rows(exploreCache.trending.slice(0, 5));
@@ -803,11 +791,6 @@ async function renderHome() {
     view.innerHTML = page(html);
     const pt = $('#playTrend'); if (pt) pt.onclick = () => playList(exploreCache.trending, 0);
     markCurrent();
-    loadTelugu().then(t => { // filled in when ready, so Home never waits for it
-      const el = $('#teluguShelf'); if (!el || !onPage('home')) return;
-      const items = [...t.songs.slice(0, 6).map(x => ({ ...x, kind: 'song' })), ...(t.shelves[0]?.items || []).slice(0, 6)];
-      if (items.length) el.innerHTML = head('Telugu Beats', `<a href="#/telugu">See All ${ICON.chev}</a>`) + `<div class="shelf">${items.map(cardHtml).join('')}</div>`;
-    }).catch(() => {});
   } catch { view.innerHTML = page('<div class="lt">Home</div>' + offlineMsg()); }
 }
 const offlineMsg = () => DL && DL.list().length
@@ -843,7 +826,7 @@ function renderSearch() {
 }
 function browse() {
   const moods = (exploreCache?.moods?.length ? exploreCache.moods : FALLBACK_MOODS).slice(0, 24);
-  return head('Browse Categories', '', true) + '<div class="tiles"><button class="tile" data-go2="telugu" style="background:linear-gradient(135deg,#ff2d55,#ff9500)">Telugu Beats</button>' + moods.map((m, i) =>
+  return head('Browse Categories', '', true) + '<div class="tiles">' + moods.map((m, i) =>
     `<button class="tile" data-q="${esc(m)} music" style="background:linear-gradient(135deg,${TILE_COLORS[i % TILE_COLORS.length]})">${esc(m)}</button>`).join('') + '</div>';
 }
 async function doSearch(q) {
@@ -920,7 +903,6 @@ function route() {
   if (a === 'search') renderSearch();
   else if (a === 'library' || a === 'recent') renderLib();
   else if (a === 'new') renderNew();
-  else if (a === 'telugu') renderTelugu();
   else if (a === 'album' || a === 'playlist') renderCollection(a, decodeURIComponent(b));
   else renderHome();
 }
