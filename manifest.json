@@ -1,8 +1,9 @@
 {
- "build": 202611222346,
+ "build": 202611230720,
  "files": {
   "app-bridge.js": "9c0a031f8aa9ac33d06c1e28c46ec430b5955b9afd27bc6a88780d6343b6f518",
-  "engine.js": "d4b65ef78f28dda7f519ba1945de7e57452e227b5ca19cecbd24825cc092fdd5",
-  "index.html": "51995e990757b8a8e69371cb06b12d8dc865981fac2e220f9d3af6fd12cda027"
+  "engine.js": "69de4f3eaec645eddc6307bfef9ca1b06f1bbf00116eafd21305f5d60007eb78",
+  "icon-180.png": "e8701d7594ef8d38a3b6364dc7543cff3a23be1eaf0c17a0b4d36d9cf702759e",
+  "index.html": "f825b308de1a43f623a9d1ee0ae5b84262b48f7eed86b9a3eed2f7552924ad83"
  }
 }
