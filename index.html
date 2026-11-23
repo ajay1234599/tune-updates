@@ -233,6 +233,13 @@ input[type=range]:hover::-webkit-slider-thumb,input[type=range]:active::-webkit-
 .np .toggles button{width:34px;height:28px;border-radius:7px;background:rgba(255,255,255,.14);display:grid;place-items:center;font-size:15px;color:rgba(255,255,255,.8)}
 .np .toggles button.on{background:#fff;color:#000}
 .np .meta{display:flex;align-items:center;gap:12px;margin-top:6px}
+.np .lyline{display:block;width:100%;text-align:left;margin-top:10px;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,.12);font-size:15px;font-weight:600;color:rgba(255,255,255,.92);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:38px}
+.np .lyline:empty{display:none}
+.np .lyline .lbl{font-size:10px;font-weight:700;letter-spacing:.06em;color:rgba(255,255,255,.6);margin-right:8px}
+.np.showly .lyline{display:none}
+.np .art{cursor:pointer}
+.np .foot2 .lyb{width:auto;padding:0 12px;gap:6px;display:flex;align-items:center;font-size:13px;font-weight:600}
+.np .foot2 .lyb svg{font-size:18px}
 .np .meta .txt{flex:1;min-width:0}
 .np .meta .t{font-size:21px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .np .meta .a{font-size:19px;color:rgba(255,255,255,.65);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -400,6 +407,7 @@ input[type=range]:hover::-webkit-slider-thumb,input[type=range]:active::-webkit-
         <button class="roundb" id="npLove" aria-label="Love"><svg viewBox="0 0 24 24"><path d="M12 21.4 10.6 20C5.4 15.4 2 12.3 2 8.5 2 5.4 4.4 3 7.5 3c1.7 0 3.4.8 4.5 2.1A6 6 0 0 1 16.5 3C19.6 3 22 5.4 22 8.5c0 3.8-3.4 6.9-8.6 11.5z"/></svg></button>
         <button class="roundb" id="npMore" aria-label="More"><svg viewBox="0 0 24 24"><path d="M5 10.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm7 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm7 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z"/></svg></button>
       </div>
+      <button class="lyline" id="npLyLine" aria-label="Show lyrics"></button>
       <div class="scrub">
         <input type="range" id="npSeek" min="0" max="1000" value="0" aria-label="Seek">
         <div class="times"><span id="npCur">0:00</span><span class="q" id="qual">—</span><span id="npRem">-0:00</span></div>
@@ -410,7 +418,7 @@ input[type=range]:hover::-webkit-slider-thumb,input[type=range]:active::-webkit-
         <button data-act="next" aria-label="Next"><svg viewBox="0 0 24 24"><path d="M13 12 4 19V5zm9 0-9 7V5z"/></svg></button>
       </div>
       <div class="foot2">
-        <button id="npLy" aria-label="Lyrics"><svg viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-6l-5 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm3 5v2h10V9zm0 4v2h7v-2z"/></svg></button>
+        <button id="npLy" class="lyb" aria-label="Lyrics"><svg viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-6l-5 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm3 5v2h10V9zm0 4v2h7v-2z"/></svg>Lyrics</button>
         <span class="note">No ads · No account</span>
         <button id="npQ" aria-label="Up Next"><svg viewBox="0 0 24 24"><path d="M3 6h13v2H3zm0 5h13v2H3zm0 5h9v2H3zm14-2v6l5-3z"/></svg></button>
       </div>
@@ -504,7 +512,7 @@ function showTrack() {
   api('/api/info/' + t.id + FMT).then(i => $('#qual').textContent = `${(i.codec||'').toUpperCase()} ${i.kbps} KBPS`).catch(() => $('#qual').textContent = '—');
   recent = [t, ...recent.filter(x => x.id !== t.id)].slice(0, 60); store.set('recent', recent);
   syncLikeNow(); renderQueue(); markCurrent();
-  if (np.classList.contains('showly')) loadLyrics();
+  loadLyrics(); // always, so the live line and lyrics are ready
   if (!APP && 'mediaSession' in navigator) {
     navigator.mediaSession.metadata = new MediaMetadata({ title: t.title, artist: t.artist, album: t.album || '', artwork: t.art ? [{ src: abs(t.art), sizes: '544x544' }] : [] });
   }
@@ -574,6 +582,7 @@ async function loadLyrics() {
   if (lyFor === t.id) return;
   lyFor = t.id; lyLines = null; lyIdx = -1;
   box.innerHTML = '<div class="none">Loading lyrics…</div>';
+  $('#npLyLine').innerHTML = '';
   try {
     let l = lyCache.get(t.id) || store.get('ly.' + t.id, null);
     if (!l) {
@@ -587,15 +596,20 @@ async function loadLyrics() {
       syncLyrics(true);
     } else if (l.plain) {
       box.innerHTML = `<div class="plain">${esc(l.plain)}</div><div class="src">Lyrics: ${esc(l.source)}</div>`;
+      $('#npLyLine').innerHTML = `<span class="lbl">LYRICS</span>${esc(l.plain.split('\n').find(x => x.trim()) || '')}`;
     } else box.innerHTML = '<div class="none">No lyrics available for this song.</div>';
   } catch { if (lyFor === t.id) { lyFor = null; $('#npLyrics').innerHTML = '<div class="none">Couldn’t load lyrics.</div>'; } }
 }
 function syncLyrics(force = false) {
-  if (!lyLines || !np.classList.contains('showly')) return;
+  if (!lyLines) return;
   const t = audio.currentTime + 0.25;
   let i = lyLines.length - 1; while (i >= 0 && lyLines[i].t > t) i--;
   if (i === lyIdx && !force) return;
   lyIdx = i;
+  // live line under the title (find the nearest non-empty line)
+  let j = Math.max(0, i); while (j < lyLines.length - 1 && !lyLines[j].text) j++;
+  $('#npLyLine').innerHTML = lyLines[j]?.text ? `<span class="lbl">LYRICS</span>${esc(lyLines[j].text)}` : '';
+  if (!np.classList.contains('showly')) return;
   const els = $$('#npLyrics .ln');
   els.forEach((e, j) => e.classList.toggle('on', j === i));
   const el = els[Math.max(0, i)]; const box = $('#npLyrics');
@@ -610,8 +624,11 @@ function setNPView(v) { // 'art' | 'queue' | 'lyrics'
   np.classList.toggle('showq', v === 'queue'); np.classList.toggle('showly', v === 'lyrics');
   $('#npQ').classList.toggle('on', v === 'queue'); $('#npLy').classList.toggle('on', v === 'lyrics');
   if (v === 'lyrics') { loadLyrics().then(() => syncLyrics(true)); }
+  if (v !== 'queue') store.set('npView', v); // reopen on lyrics if that's what you used last
 }
-function openNP(showQueue = false) { if (!cur()) return; np.classList.add('open'); setNPView(showQueue ? 'queue' : 'art'); }
+function openNP(showQueue = false) { if (!cur()) return; np.classList.add('open'); setNPView(showQueue ? 'queue' : store.get('npView', 'art')); }
+$('#npLyLine').onclick = () => setNPView('lyrics');
+$('#npArt').onclick = () => setNPView('lyrics');
 function closeNP() { np.classList.remove('open'); }
 $('#barOpen').onclick = () => openNP(false);
 $('#bar').addEventListener('click', e => { if (matchMedia('(max-width:820px)').matches && !e.target.closest('button')) openNP(false); });
@@ -634,6 +651,7 @@ function openMenu(t, fromNP = false) {
     !fromNP && ['Play Next', ICON.next, () => insertNext(t)],
     !fromNP && ['Play Later', ICON.later, () => addLater(t)],
     [isLiked(t.id) ? 'Remove from Loved' : 'Love', ICON.heart, () => toggleLike(t)],
+    fromNP && ['View Lyrics', '<svg viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-6l-5 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm3 5v2h10V9zm0 4v2h7v-2z"/></svg>', () => setNPView('lyrics')],
     ['Create Station', ICON.radio, () => startRadio(t)],
     DL && (DL.has(t.id) ? ['Remove Download', ICON.trash, () => DL.remove(t.id)]
                         : DL.progress(t.id) == null && ['Download', ICON.download, () => { DL.download(t); toast('Downloading…', ICON.download); }]),
