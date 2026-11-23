@@ -48,14 +48,67 @@
   };
   const emit = type => (listeners[type] || []).forEach(fn => { try { fn(); } catch (e) { console.error(e); } });
 
-  const item = (t, s) => ({ id: t.id, url: s.url, title: t.title, artist: t.artist || '', album: t.album || '', art: t.art || '' });
+  // ---- offline downloads (native shell v2+) ----
+  const canDownload = (window.TUNE_NATIVE || 0) >= 2;
+  const present = new Set(window.__TUNE_DOWNLOADS || []);
+  let dlList = store.get('downloads', []).filter(t => present.has(t.id)); // song details; files live natively
+  let dlBytes = window.__TUNE_DL_BYTES || 0;
+  const dlState = {}, pending = {}, dlRetried = new Set();
+  const notify = (id, state) => { try { window.onDownloadsChanged?.(id, state); } catch (e) { console.error(e); } };
+  async function download(t) {
+    if (!canDownload || present.has(t.id) || t.id in dlState) return;
+    dlState[t.id] = 0; pending[t.id] = t; notify(t.id, 'start');
+    try {
+      const s = await E.stream(t.id);
+      native.player.postMessage({ cmd: 'download', id: t.id, url: s.url, length: s.length, art: t.art || '' });
+    } catch { delete dlState[t.id]; notify(t.id, 'failed'); }
+  }
+  async function downloadMany(list) { // two at a time, skipping ones already saved
+    const todo = list.filter(t => !present.has(t.id) && !(t.id in dlState));
+    for (const t of todo) { download(t); while (Object.keys(dlState).length >= 2) await new Promise(r => setTimeout(r, 400)); }
+    return todo.length;
+  }
+  function removeDownload(id) { native.player.postMessage({ cmd: 'deleteDownload', id }); }
+  function onDownload(ev) {
+    const id = ev.id;
+    if (ev.state === 'progress') { dlState[id] = ev.progress; notify(id, 'progress'); return; }
+    if (ev.state === 'done') {
+      const t = pending[id] || { id, title: id, artist: '' };
+      present.add(id); delete dlState[id]; delete pending[id]; dlBytes = ev.bytes || dlBytes;
+      dlList = [{ ...t, art: 'dl/' + id + '.jpg', remoteArt: t.art || '' }, ...dlList.filter(x => x.id !== id)];
+      store.set('downloads', dlList); notify(id, 'done'); return;
+    }
+    if (ev.state === 'failed') {
+      delete dlState[id];
+      if (!dlRetried.has(id) && pending[id]) { dlRetried.add(id); E.forgetStream(id); const t = pending[id]; delete pending[id]; return download(t); } // link expired → fresh one
+      delete pending[id]; notify(id, 'failed'); return;
+    }
+    if (ev.state === 'removed') {
+      present.delete(id); dlBytes = ev.bytes ?? dlBytes;
+      dlList = dlList.filter(x => x.id !== id); store.set('downloads', dlList); notify(id, 'removed');
+    }
+  }
+  const downloads = {
+    enabled: canDownload,
+    has: id => present.has(id),
+    progress: id => (id in dlState ? dlState[id] : null),
+    active: () => Object.keys(dlState).length,
+    list: () => dlList.slice(),
+    bytes: () => dlBytes,
+    download, downloadMany, remove: removeDownload,
+  };
+
+  const item = (t, s) => present.has(t.id)
+    ? { id: t.id, url: 'tune-dl://' + t.id, title: t.title, artist: t.artist || '', album: t.album || '', art: 'dl/' + t.id + '.jpg' } // plays offline
+    : { id: t.id, url: s.url, title: t.title, artist: t.artist || '', album: t.album || '', art: t.art || '' };
+  const resolve = async t => (present.has(t.id) ? null : E.stream(t.id));
   let gen = 0, upGen = 0, retried = new Set();
 
   async function start() {
     const my = ++gen, t = cur();
     if (!t) return;
     try {
-      const s = await E.stream(t.id);
+      const s = await resolve(t);
       if (my !== gen) return;
       native.player.postMessage({ cmd: 'queue', items: [item(t, s)] });
       syncUpcoming();
@@ -69,7 +122,7 @@
   async function syncUpcoming() {
     const my = ++upGen, base = idx, ups = queue.slice(idx + 1, idx + 1 + LOOKAHEAD), items = [];
     for (let i = 0; i < ups.length; i++) {
-      try { items.push(item(ups[i], await E.stream(ups[i].id))); } catch {}
+      try { items.push(item(ups[i], await resolve(ups[i]))); } catch {} // offline: only downloaded songs get queued
       if (my !== upGen || base !== idx) return;
       if (i === 1) native.player.postMessage({ cmd: 'upcoming', items: items.slice() }); // fast first batch
     }
@@ -87,6 +140,7 @@
         break;
       }
       case 'queueEnd': next(); break;
+      case 'download': onDownload(ev); break;
       case 'remote': if (ev.cmd === 'prev') prev(); else if (ev.cmd === 'next') next(); break;
       case 'error': {
         const t = cur();
@@ -101,7 +155,7 @@
 
   window.TuneApp = {
     api: p => E.handle(p),
-    store, audio, start, syncUpcoming, onNative,
+    store, audio, start, syncUpcoming, onNative, downloads,
     setRepeat: on => native.player.postMessage({ cmd: 'repeat', on }),
   };
 })();

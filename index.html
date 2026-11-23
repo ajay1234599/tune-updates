@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Pulse</title>
 <!-- iPhone "Add to Home Screen": full-screen app with its own icon -->
 <link rel="manifest" href="/static/manifest.webmanifest">
@@ -32,7 +32,7 @@
   }
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%}
+html,body{height:100%;touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;overflow:hidden;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 img{display:block}
@@ -74,8 +74,7 @@ main > .page{animation:fade .25s ease}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(172px,1fr));gap:22px 16px}
 .card{text-align:left;min-width:0;scroll-snap-align:start}
 .card .art{position:relative;aspect-ratio:1;border-radius:var(--radius);overflow:hidden;background:var(--fill);margin-bottom:8px;box-shadow:0 0 0 .5px var(--sep)}
-.card .art img{width:100%;height:100%;object-fit:cover;transition:transform .35s ease}
-.card:hover .art img{transform:scale(1.03)}
+.card .art img{width:100%;height:100%;object-fit:cover}
 .card .play{position:absolute;left:8px;bottom:8px;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:grid;place-items:center;font-size:15px;opacity:0;transition:.2s}
 .card:hover .play{opacity:1}
 .card .t{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -107,6 +106,11 @@ main > .page{animation:fade .25s ease}
 .heart{opacity:0}
 .row:hover .heart,.heart.on{opacity:1}
 .heart.on{color:var(--accent)}
+.dlic{display:none;width:13px;height:13px;margin-right:5px;vertical-align:-2px;color:var(--muted)}
+.row.dl .dlic.ok{display:inline-block}
+.row.dling .dlic.spin{display:inline-block;border:2px solid var(--fill2);border-top-color:var(--accent);border-radius:50%;animation:rot .8s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+.pill.icon{min-width:0;padding:11px 14px}
 .yt{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:#fff;background:#e5202e;border-radius:4px;padding:1px 5px;margin-right:6px;vertical-align:1px}
 .eq{position:absolute;left:8px;top:6px;width:48px;height:48px;border-radius:6px;background:rgba(0,0,0,.45);align-items:flex-end;justify-content:center;gap:3px;padding-bottom:15px}
 .eq i{width:3px;background:#fff;border-radius:2px;animation:eq .9s ease-in-out infinite}
@@ -143,8 +147,34 @@ main > .page{animation:fade .25s ease}
 .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px}
 .tile{position:relative;height:104px;border-radius:12px;padding:12px;text-align:left;color:#fff;font-weight:700;font-size:16px;overflow:hidden;display:flex;align-items:flex-end;box-shadow:inset 0 -40px 40px -30px rgba(0,0,0,.35)}
 .tile::before{content:"";position:absolute;right:-18px;top:-18px;width:80px;height:80px;border-radius:18px;background:rgba(255,255,255,.18);transform:rotate(22deg)}
-.tile:active{transform:scale(.98)}
+.tile:active{opacity:.85}
 
+/* featured carousel (Top Picks) */
+.feat{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(320px,32%);gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -40px 6px;padding:0 40px 6px;scroll-padding:40px;scrollbar-width:none}
+.feat::-webkit-scrollbar{display:none}
+.fcard{scroll-snap-align:start;text-align:left;min-width:0}
+.fcard .k{font-size:11px;font-weight:600;letter-spacing:.04em;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
+.fcard .box{position:relative;aspect-ratio:4/5;border-radius:14px;overflow:hidden;background:var(--fill);box-shadow:0 0 0 .5px var(--sep)}
+.fcard .box img.bgi{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(30px) saturate(1.6);transform:scale(1.3)}
+.fcard .box img.cov{position:absolute;left:14%;top:9%;width:72%;aspect-ratio:1;border-radius:10px;object-fit:cover;box-shadow:0 14px 36px rgba(0,0,0,.4)}
+.fcard .box .cap{position:absolute;left:0;right:0;bottom:0;padding:14px 16px;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.55))}
+.fcard .box .cap .t{font-weight:700;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fcard .box .cap .s{font-size:13px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.banner{position:relative;border-radius:16px;overflow:hidden;padding:22px 20px;margin:4px 0 8px;color:#fff;background:linear-gradient(135deg,#ff2d55,#ff9500 55%,#ffcc00)}
+.banner h3{font-size:24px;font-weight:800;letter-spacing:-.02em}
+.banner p{opacity:.9;font-size:14px;margin-top:4px;max-width:420px}
+.banner .btns{margin-top:14px}
+.banner .pill{background:rgba(255,255,255,.95);color:#e5202e}
+/* lyrics */
+.np .lyrics{display:none;flex:1;min-height:0;overflow-y:auto;margin:14px -6px 6px;padding:20px 6px 40vh;scroll-behavior:smooth;-webkit-mask-image:linear-gradient(transparent,#000 8%,#000 80%,transparent);mask-image:linear-gradient(transparent,#000 8%,#000 80%,transparent)}
+.np.showly .stage,.np.showly .queue{display:none}
+.np.showly .lyrics{display:block}
+.lyrics .ln{display:block;width:100%;text-align:left;font-size:27px;font-weight:800;line-height:1.28;letter-spacing:-.01em;color:rgba(255,255,255,.32);padding:7px 0;transition:color .25s}
+.lyrics .ln.on{color:#fff}
+.lyrics .ln.gap{min-height:22px}
+.lyrics .plain{white-space:pre-wrap;font-size:21px;font-weight:700;line-height:1.45;color:rgba(255,255,255,.9)}
+.lyrics .src{font-size:12px;color:rgba(255,255,255,.5);padding-top:18px}
+.lyrics .none{color:rgba(255,255,255,.6);font-size:17px;padding-top:30%;text-align:center}
 /* skeletons */
 .sk{background:linear-gradient(90deg,var(--fill) 25%,var(--fill2) 37%,var(--fill) 63%);background-size:400% 100%;animation:sk 1.3s ease infinite;border-radius:var(--radius)}
 @keyframes sk{0%{background-position:100% 50%}100%{background-position:0 50%}}
@@ -182,13 +212,12 @@ input[type=range]:hover::-webkit-slider-thumb,input[type=range]:active::-webkit-
 .np .bg img{position:absolute;width:160%;height:160%;left:-30%;top:-30%;object-fit:cover;filter:blur(70px) saturate(1.7);opacity:.9;animation:drift 38s linear infinite}
 .np .bg img+img{animation-duration:52s;animation-direction:reverse;opacity:.55;mix-blend-mode:screen}
 .np .bg::after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(0,0,0,.12),rgba(0,0,0,.42))}
-@keyframes drift{from{transform:rotate(0) scale(1.1)}to{transform:rotate(360deg) scale(1.1)}}
+@keyframes drift{from{transform:rotate(0)}to{transform:rotate(360deg)}}
 .np .in{position:relative;height:100%;display:flex;flex-direction:column;max-width:460px;margin:0 auto;padding:calc(var(--st) + 10px) 26px calc(var(--sb) + 18px)}
 .grab{display:block;width:40px;height:5px;border-radius:3px;background:rgba(255,255,255,.45);margin:4px auto 0;flex:none}
 .np .close{position:absolute;top:calc(var(--st) + 14px);right:18px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.16);display:none;place-items:center;font-size:16px}
 .np .stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:18px 0}
-.np .art{width:100%;max-width:400px;aspect-ratio:1;border-radius:12px;object-fit:cover;box-shadow:0 24px 60px rgba(0,0,0,.45);transition:transform .5s cubic-bezier(.34,1.56,.64,1),box-shadow .5s;background:rgba(255,255,255,.08)}
-.np.paused .art{transform:scale(.8);box-shadow:0 10px 30px rgba(0,0,0,.3)}
+.np .art{width:100%;max-width:400px;aspect-ratio:1;border-radius:12px;object-fit:cover;box-shadow:0 24px 60px rgba(0,0,0,.45);background:rgba(255,255,255,.08)}
 .np .queue{display:none;flex:1;min-height:0;overflow-y:auto;margin:14px -10px 6px;padding:0 10px}
 .np.showq .stage{display:none}
 .np.showq .queue{display:block}
@@ -218,7 +247,7 @@ input[type=range]:hover::-webkit-slider-thumb,input[type=range]:active::-webkit-
 .np .ctl{justify-content:space-around;margin:18px 6px 10px;gap:0}
 .np .ctl button{color:#fff;font-size:40px}
 .np .ctl .pp{font-size:56px}
-.np .ctl button:active{transform:scale(.88);opacity:.7}
+.np .ctl button:active{opacity:.6}
 .np .foot2{display:flex;justify-content:space-between;align-items:center;padding:6px 18px 0;color:rgba(255,255,255,.65)}
 .np .foot2 button{font-size:22px;display:grid;place-items:center;width:44px;height:36px;border-radius:9px}
 .np .foot2 button.on{background:rgba(255,255,255,.2);color:#fff}
@@ -253,6 +282,8 @@ input[type=range]:hover::-webkit-slider-thumb,input[type=range]:active::-webkit-
   .shelf{grid-auto-columns:150px;gap:12px;margin:0 -16px;padding-left:16px;padding-right:16px;scroll-padding:16px}
   .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 12px}
   .tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .feat{grid-auto-columns:78%;gap:12px;margin:0 -16px 6px;padding:0 16px 6px;scroll-padding:16px}
+  .lyrics .ln{font-size:25px}
   .card .play{display:none}
   .row{grid-template-columns:48px minmax(0,1fr) auto auto;padding:6px 0}
   .row::after{left:60px;right:0}
@@ -285,6 +316,8 @@ input[type=range]:hover::-webkit-slider-thumb,input[type=range]:active::-webkit-
   .toast.show{transform:translate(-50%,0)}
 }
 @media (min-width:821px){
+  .np.showly .stage{display:none}
+  .np .lyrics{flex:1.1;height:min(78vh,640px)}
   .np .in{max-width:1100px;flex-direction:row;align-items:center;gap:60px;padding:48px 60px}
   .np .grab{display:none}
   .np .close{display:grid}
@@ -303,6 +336,7 @@ input[type=range]:hover::-webkit-slider-thumb,input[type=range]:active::-webkit-
     <div class="sfield" data-go="search"><svg viewBox="0 0 24 24"><path d="M10 2a8 8 0 0 1 6.3 12.9l5.4 5.4-1.4 1.4-5.4-5.4A8 8 0 1 1 10 2zm0 2a6 6 0 1 0 0 12 6 6 0 0 0 0-12z"/></svg>Search</div>
     <button class="nav" data-go="home"><svg viewBox="0 0 24 24"><path d="M12 3 2.5 11.2l1.3 1.5L5 11.7V21h5.5v-6h3v6H19v-9.3l1.2 1 1.3-1.5z"/></svg>Home</button>
     <button class="nav" data-go="new"><svg viewBox="0 0 24 24"><path d="m12 2 2.4 6.2L21 9l-5 4.4L17.5 20 12 16.6 6.5 20 8 13.4 3 9l6.6-.8z"/></svg>New</button>
+    <button class="nav" data-go="telugu"><svg viewBox="0 0 24 24"><path d="M20 3v12.5a3.5 3.5 0 1 1-2-3.2V7.3l-9 1.9v8.3a3.5 3.5 0 1 1-2-3.2V5z"/></svg>Telugu Beats</button>
     <div class="grp">Library</div>
     <button class="nav" data-go="library"><svg viewBox="0 0 24 24"><path d="M12 21.4 10.6 20C5.4 15.4 2 12.3 2 8.5 2 5.4 4.4 3 7.5 3c1.7 0 3.4.8 4.5 2.1A6 6 0 0 1 16.5 3C19.6 3 22 5.4 22 8.5c0 3.8-3.4 6.9-8.6 11.5z"/></svg>Loved Songs</button>
     <button class="nav" data-go="recent"><svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l4 4 4-4H6a7 7 0 1 1 2 4.9l-1.4 1.4A9 9 0 1 0 13 3zm-1 5v5l4.3 2.5.7-1.2-3.5-2.1V8z"/></svg>Recently Played</button>
@@ -314,6 +348,7 @@ input[type=range]:hover::-webkit-slider-thumb,input[type=range]:active::-webkit-
   <nav class="tabbar">
     <button data-go="home"><svg viewBox="0 0 24 24"><path d="M12 3 2.5 11.2l1.3 1.5L5 11.7V21h5.5v-6h3v6H19v-9.3l1.2 1 1.3-1.5z"/></svg>Home</button>
     <button data-go="new"><svg viewBox="0 0 24 24"><path d="m12 2 2.4 6.2L21 9l-5 4.4L17.5 20 12 16.6 6.5 20 8 13.4 3 9l6.6-.8z"/></svg>New</button>
+    <button data-go="telugu"><svg viewBox="0 0 24 24"><path d="M20 3v12.5a3.5 3.5 0 1 1-2-3.2V7.3l-9 1.9v8.3a3.5 3.5 0 1 1-2-3.2V5z"/></svg>Telugu</button>
     <button data-go="library"><svg viewBox="0 0 24 24"><path d="M4 3h3v18H4zm5 0h3v18H9zm5.2.6 2.9-.8 4.6 17.4-2.9.8z"/></svg>Library</button>
     <button data-go="search"><svg viewBox="0 0 24 24"><path d="M10 2a8 8 0 0 1 6.3 12.9l5.4 5.4-1.4 1.4-5.4-5.4A8 8 0 1 1 10 2zm0 2a6 6 0 1 0 0 12 6 6 0 0 0 0-12z"/></svg>Search</button>
   </nav>
@@ -358,6 +393,7 @@ input[type=range]:hover::-webkit-slider-thumb,input[type=range]:active::-webkit-
       <div class="qsub">Autoplay continues with similar songs</div>
       <div class="list" id="qList"></div>
     </div>
+    <div class="lyrics" id="npLyrics"></div>
     <div class="side2">
       <div class="meta">
         <div class="txt"><div class="t" id="npT"></div><div class="a" id="npA"></div></div>
@@ -374,6 +410,7 @@ input[type=range]:hover::-webkit-slider-thumb,input[type=range]:active::-webkit-
         <button data-act="next" aria-label="Next"><svg viewBox="0 0 24 24"><path d="M13 12 4 19V5zm9 0-9 7V5z"/></svg></button>
       </div>
       <div class="foot2">
+        <button id="npLy" aria-label="Lyrics"><svg viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-6l-5 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm3 5v2h10V9zm0 4v2h7v-2z"/></svg></button>
         <span class="note">No ads · No account</span>
         <button id="npQ" aria-label="Up Next"><svg viewBox="0 0 24 24"><path d="M3 6h13v2H3zm0 5h13v2H3zm0 5h9v2H3zm14-2v6l5-3z"/></svg></button>
       </div>
@@ -389,6 +426,7 @@ input[type=range]:hover::-webkit-slider-thumb,input[type=range]:active::-webkit-
 <script>if (window.TUNE_APP) document.write('<script src="engine.js"><\/script><script src="app-bridge.js"><\/script>');</script>
 <script>
 const APP = window.TuneApp || null; // set when running inside the iPhone app
+const DL = APP?.downloads?.enabled ? APP.downloads : null; // offline downloads (iPhone app only)
 const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
 const view = $('#view'), audio = APP ? APP.audio : $('#audio');
@@ -401,6 +439,8 @@ const ICON = {
   radio: '<svg viewBox="0 0 24 24"><path d="M12 10a2 2 0 1 1 0 4 2 2 0 0 1 0-4zM7.8 7.8l1.4 1.4a4 4 0 0 0 0 5.6l-1.4 1.4a6 6 0 0 1 0-8.4zm8.4 0a6 6 0 0 1 0 8.4l-1.4-1.4a4 4 0 0 0 0-5.6zM5 5l1.4 1.4a8 8 0 0 0 0 11.2L5 19A10 10 0 0 1 5 5zm14 0a10 10 0 0 1 0 14l-1.4-1.4a8 8 0 0 0 0-11.2z"/></svg>',
   later: '<svg viewBox="0 0 24 24"><path d="M3 6h13v2H3zm0 5h13v2H3zm0 5h9v2H3zm16-3h2v3h3v2h-3v3h-2v-3h-3v-2h3z"/></svg>',
   check: '<svg viewBox="0 0 24 24"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>',
+  download: '<svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm-1 5v6.2L8.4 10.6 7 12l5 5 5-5-1.4-1.4-2.6 2.6V7z"/></svg>',
+  trash: '<svg viewBox="0 0 24 24"><path d="M9 3h6l1 2h4v2H4V5h4zm-3 6h12l-1 12H7z"/></svg>',
   chev: '<svg viewBox="0 0 24 24" style="font-size:13px;vertical-align:-1px"><path d="M8.6 5.4 10 4l8 8-8 8-1.4-1.4 6.6-6.6z"/></svg>',
 };
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -464,6 +504,7 @@ function showTrack() {
   api('/api/info/' + t.id + FMT).then(i => $('#qual').textContent = `${(i.codec||'').toUpperCase()} ${i.kbps} KBPS`).catch(() => $('#qual').textContent = '—');
   recent = [t, ...recent.filter(x => x.id !== t.id)].slice(0, 60); store.set('recent', recent);
   syncLikeNow(); renderQueue(); markCurrent();
+  if (np.classList.contains('showly')) loadLyrics();
   if (!APP && 'mediaSession' in navigator) {
     navigator.mediaSession.metadata = new MediaMetadata({ title: t.title, artist: t.artist, album: t.album || '', artwork: t.art ? [{ src: abs(t.art), sizes: '544x544' }] : [] });
   }
@@ -525,20 +566,64 @@ $$('[data-act]').forEach(b => b.onclick = e => { e.stopPropagation(); ({ pp: tog
 $('#barLove').onclick = $('#npLove').onclick = () => cur() && toggleLike(cur());
 $('#npMore').onclick = () => cur() && openMenu(cur(), true);
 
+// ---- lyrics (synced when available) ----
+const lyCache = new Map();
+let lyFor = null, lyLines = null, lyIdx = -1;
+async function loadLyrics() {
+  const t = cur(), box = $('#npLyrics'); if (!t || !box) return;
+  if (lyFor === t.id) return;
+  lyFor = t.id; lyLines = null; lyIdx = -1;
+  box.innerHTML = '<div class="none">Loading lyrics…</div>';
+  try {
+    let l = lyCache.get(t.id) || store.get('ly.' + t.id, null);
+    if (!l) {
+      l = await api(`/api/lyrics/${encodeURIComponent(t.id)}?` + new URLSearchParams({ title: t.title, artist: t.artist || '', dur: t.duration || '' }));
+      if (l.synced || l.plain) { lyCache.set(t.id, l); if (DL?.has(t.id)) store.set('ly.' + t.id, l); } // keep lyrics for offline songs
+    }
+    if (lyFor !== t.id) return;
+    if (l.synced?.length) {
+      lyLines = l.synced;
+      box.innerHTML = l.synced.map((x, i) => `<button class="ln${x.text ? '' : ' gap'}" data-i="${i}">${esc(x.text) || ''}</button>`).join('') + `<div class="src">Lyrics: ${esc(l.source)}</div>`;
+      syncLyrics(true);
+    } else if (l.plain) {
+      box.innerHTML = `<div class="plain">${esc(l.plain)}</div><div class="src">Lyrics: ${esc(l.source)}</div>`;
+    } else box.innerHTML = '<div class="none">No lyrics available for this song.</div>';
+  } catch { if (lyFor === t.id) { lyFor = null; $('#npLyrics').innerHTML = '<div class="none">Couldn’t load lyrics.</div>'; } }
+}
+function syncLyrics(force = false) {
+  if (!lyLines || !np.classList.contains('showly')) return;
+  const t = audio.currentTime + 0.25;
+  let i = lyLines.length - 1; while (i >= 0 && lyLines[i].t > t) i--;
+  if (i === lyIdx && !force) return;
+  lyIdx = i;
+  const els = $$('#npLyrics .ln');
+  els.forEach((e, j) => e.classList.toggle('on', j === i));
+  const el = els[Math.max(0, i)]; const box = $('#npLyrics');
+  if (el) box.scrollTo({ top: el.offsetTop - box.clientHeight * 0.3, behavior: force ? 'auto' : 'smooth' });
+}
+$('#npLyrics').addEventListener('click', e => { const b = e.target.closest('.ln'); if (b && lyLines) { audio.currentTime = lyLines[+b.dataset.i].t; audio.play(); } });
+audio.addEventListener('timeupdate', () => syncLyrics());
+
 // ---- Now Playing sheet ----
 const np = $('#np');
-function openNP(showQueue = false) { if (!cur()) return; np.classList.add('open'); np.classList.toggle('showq', showQueue); $('#npQ').classList.toggle('on', showQueue); }
+function setNPView(v) { // 'art' | 'queue' | 'lyrics'
+  np.classList.toggle('showq', v === 'queue'); np.classList.toggle('showly', v === 'lyrics');
+  $('#npQ').classList.toggle('on', v === 'queue'); $('#npLy').classList.toggle('on', v === 'lyrics');
+  if (v === 'lyrics') { loadLyrics().then(() => syncLyrics(true)); }
+}
+function openNP(showQueue = false) { if (!cur()) return; np.classList.add('open'); setNPView(showQueue ? 'queue' : 'art'); }
 function closeNP() { np.classList.remove('open'); }
 $('#barOpen').onclick = () => openNP(false);
 $('#bar').addEventListener('click', e => { if (matchMedia('(max-width:820px)').matches && !e.target.closest('button')) openNP(false); });
 $('#barQueue').onclick = () => openNP(true);
 $('#npGrab').onclick = closeNP; $('#npX').onclick = closeNP;
-$('#npQ').onclick = () => { const on = !np.classList.contains('showq'); np.classList.toggle('showq', on); $('#npQ').classList.toggle('on', on); };
+$('#npQ').onclick = () => setNPView(np.classList.contains('showq') ? 'art' : 'queue');
+$('#npLy').onclick = () => setNPView(np.classList.contains('showly') ? 'art' : 'lyrics');
 // swipe down to close (phone)
 (() => {
   let y0 = null, dy = 0;
   const inEl = $('#npIn');
-  inEl.addEventListener('touchstart', e => { if (e.target.closest('input,.queue')) return; y0 = e.touches[0].clientY; dy = 0; np.style.transition = 'none'; }, { passive: true });
+  inEl.addEventListener('touchstart', e => { if (e.target.closest('input,.queue,.lyrics')) return; y0 = e.touches[0].clientY; dy = 0; np.style.transition = 'none'; }, { passive: true });
   inEl.addEventListener('touchmove', e => { if (y0 == null) return; dy = Math.max(0, e.touches[0].clientY - y0); np.style.transform = `translateY(${dy}px)`; }, { passive: true });
   inEl.addEventListener('touchend', () => { if (y0 == null) return; np.style.transition = ''; np.style.transform = ''; if (dy > 110) closeNP(); y0 = null; });
 })();
@@ -550,6 +635,8 @@ function openMenu(t, fromNP = false) {
     !fromNP && ['Play Later', ICON.later, () => addLater(t)],
     [isLiked(t.id) ? 'Remove from Loved' : 'Love', ICON.heart, () => toggleLike(t)],
     ['Create Station', ICON.radio, () => startRadio(t)],
+    DL && (DL.has(t.id) ? ['Remove Download', ICON.trash, () => DL.remove(t.id)]
+                        : DL.progress(t.id) == null && ['Download', ICON.download, () => { DL.download(t); toast('Downloading…', ICON.download); }]),
   ].filter(Boolean);
   $('#sheet').innerHTML = `<div class="box"><div class="head"><img src="${esc(sm(t.art))}" alt=""><div style="min-width:0"><div class="t">${esc(t.title)}</div><div class="a">${esc(t.artist)}</div></div></div>
     ${opts.map((o, i) => `<button class="opt" data-o="${i}">${o[0]}${o[1]}</button>`).join('')}</div><button class="cancel">Cancel</button>`;
@@ -576,17 +663,26 @@ if (!APP && 'mediaSession' in navigator) {
 
 // ---- rendering ----
 const lists = {}, cards = {};
+const dlClass = id => !DL ? '' : DL.has(id) ? ' dl' : DL.progress(id) != null ? ' dling' : '';
+const mb = b => b > 1e9 ? (b / 1e9).toFixed(1) + ' GB' : Math.max(1, Math.round(b / 1e6)) + ' MB';
+window.onDownloadsChanged = (id, state) => {
+  $$(`.row[data-id="${CSS.escape(id)}"]`).forEach(r => { r.classList.toggle('dl', DL.has(id)); r.classList.toggle('dling', DL.progress(id) != null); });
+  if (state === 'failed') toast('Download failed');
+  if ((state === 'done' || state === 'removed') && onPage('library', 'recent') && libTab === 'downloads') renderLib();
+  if (state === 'done' && !DL.active()) toast('Downloaded', ICON.download);
+};
+
 let listSeq = 0;
 // mode 'single': tapping a song plays it and then its radio (search results); otherwise plays the list from there.
 function rows(list, { numbered = false, single = false } = {}) {
   if (!list.length) return '';
   const id = 'L' + (++listSeq); lists[id] = { list, single };
   return `<div class="list${numbered ? ' numbered' : ''}" data-list="${id}">` + list.map((t, i) => `
-    <div class="row" role="button" tabindex="0" data-i="${i}" data-id="${esc(t.id)}">
+    <div class="row${dlClass(t.id)}" role="button" tabindex="0" data-i="${i}" data-id="${esc(t.id)}">
       <span class="n">${i + 1}</span>
       <img decoding="async" loading="lazy" src="${esc(sm(t.art))}" alt="">
       <span class="eq"><i></i><i></i><i></i></span>
-      <div style="min-width:0"><div class="rt">${esc(t.title)}</div><div class="ra">${t.source === 'youtube' ? '<span class="yt">YouTube</span>' : ''}${esc(t.artist)}</div></div>
+      <div style="min-width:0"><div class="rt">${esc(t.title)}</div><div class="ra"><svg class="dlic ok" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm-1 5v6.2L8.4 10.6 7 12l5 5 5-5-1.4-1.4-2.6 2.6V7z"/></svg><span class="dlic spin"></span>${t.source === 'youtube' ? '<span class="yt">YouTube</span>' : ''}${esc(t.artist)}</div></div>
       <div class="al">${esc(t.album || (t.views ? t.views + ' views' : ''))}</div>
       <button class="ib heart ${isLiked(t.id) ? 'on' : ''}" data-id="${esc(t.id)}" aria-label="Love">${ICON.heart}</button>
       <button class="ib more" aria-label="More">${ICON.more}</button>
@@ -604,7 +700,7 @@ view.addEventListener('click', e => {
   const c = e.target.closest('.card');
   if (c) { const it = cards[c.dataset.k]; if (it.kind === 'song') playList([it], 0); else location.hash = `#/${it.kind}/${encodeURIComponent(it.id)}`; }
   const tile = e.target.closest('.tile');
-  if (tile) { lastQ = tile.dataset.q; renderSearch(); }
+  if (tile) { if (tile.dataset.go2) location.hash = '#/' + tile.dataset.go2; else { lastQ = tile.dataset.q; renderSearch(); } }
 });
 view.addEventListener('contextmenu', e => { const row = e.target.closest('.row'); if (row) { e.preventDefault(); const { list } = lists[row.parentElement.dataset.list]; openMenu(list[+row.dataset.i]); } });
 function cardHtml(it) {
@@ -631,21 +727,58 @@ async function loadFeeds() {
     homeAt = exploreCache.trending.length && exploreCache.releases.length ? Date.now() : 0;
   }
 }
+let teluguCache = null, teluguAt = 0;
+async function loadTelugu() {
+  if (!teluguCache || Date.now() - teluguAt > HOME_TTL) { teluguCache = await api('/api/telugu'); teluguAt = Date.now(); }
+  return teluguCache;
+}
+function featCard(it, kicker) {
+  const k = 'C' + (++listSeq); cards[k] = it;
+  return `<button class="card fcard" data-k="${k}"><div class="k">${esc(kicker)}</div><div class="box"><img class="bgi" src="${esc(it.art)}" alt=""><img class="cov" decoding="async" src="${esc(it.art)}" alt="">
+    <div class="cap"><div class="t">${esc(it.title)}</div><div class="s">${esc(it.artist)}</div></div></div></button>`;
+}
+async function renderTelugu() {
+  if (!teluguCache) view.innerHTML = page(`<div class="lt">Telugu Beats</div>${skRows(5)}${skShelf(6)}`);
+  try {
+    const t = await loadTelugu();
+    if (!onPage('telugu')) return;
+    let html = `<div class="lt">Telugu Beats</div>
+      <div class="banner"><h3>తెలుగు · Telugu Beats</h3><p>Latest hits, mass beats, melodies, folk and evergreen songs — always fresh from YouTube Music.</p>
+      <div class="btns" style="justify-content:flex-start"><button class="pill" id="tPlay"><svg viewBox="0 0 24 24">${ICON.play}</svg>Play Latest</button></div></div>`;
+    if (t.songs.length) html += head('Top Telugu Songs', '<button id="tAll">Play All</button>') + rows(t.songs.slice(0, 10));
+    for (const sh of t.shelves) html += head(esc(sh.title)) + `<div class="shelf">${sh.items.map(cardHtml).join('')}</div>`;
+    view.innerHTML = page(html);
+    const play = () => playList(t.songs, 0);
+    $('#tPlay').onclick = play; const ta = $('#tAll'); if (ta) ta.onclick = play;
+    markCurrent();
+  } catch { view.innerHTML = page('<div class="lt">Telugu Beats</div>' + offlineMsg()); }
+}
 async function renderHome() {
   if (!homeCache) view.innerHTML = page(`<div class="lt">Home</div>${skShelf(6)}${head('Trending Now')}${skRows(4)}`);
   try {
     await loadFeeds();
     if (!onPage('home')) return; // navigated away meanwhile
     let html = '<div class="lt">Home</div>';
-    if (recent.length) html += head('Recently Played', '<a href="#/recent">See All</a>', true) + '<div class="shelf">' + recent.slice(0, 12).map(t => cardHtml({ ...t, kind: 'song' })).join('') + '</div>';
+    const picks = [...exploreCache.releases.slice(0, 4).map(x => [x, 'New Release']), ...(homeCache[0]?.items || []).filter(x => x.kind !== 'song').slice(0, 3).map(x => [x, homeCache[0].title])];
+    if (picks.length) html += head('Top Picks', '', true) + `<div class="feat">${picks.map(([x, k]) => featCard(x, k)).join('')}</div>`;
+    html += `<div id="teluguShelf"></div>`;
+    if (recent.length) html += head('Recently Played', '<a href="#/recent">See All</a>') + '<div class="shelf">' + recent.slice(0, 12).map(t => cardHtml({ ...t, kind: 'song' })).join('') + '</div>';
     if (exploreCache.releases.length) html += head('New Releases', `<a href="#/new">See All ${ICON.chev}</a>`, !recent.length) + '<div class="shelf">' + exploreCache.releases.slice(0, 12).map(cardHtml).join('') + '</div>';
     if (exploreCache.trending.length) html += head('Trending Now', '<button id="playTrend">Play All</button>') + rows(exploreCache.trending.slice(0, 5));
     for (const s of homeCache) html += head(esc(s.title)) + `<div class="shelf">${s.items.map(cardHtml).join('')}</div>`;
     view.innerHTML = page(html);
     const pt = $('#playTrend'); if (pt) pt.onclick = () => playList(exploreCache.trending, 0);
     markCurrent();
-  } catch { view.innerHTML = page('<div class="lt">Home</div><div class="empty"><b>Can’t connect</b>Check your internet connection and try again.</div>'); }
+    loadTelugu().then(t => { // filled in when ready, so Home never waits for it
+      const el = $('#teluguShelf'); if (!el || !onPage('home')) return;
+      const items = [...t.songs.slice(0, 6).map(x => ({ ...x, kind: 'song' })), ...(t.shelves[0]?.items || []).slice(0, 6)];
+      if (items.length) el.innerHTML = head('Telugu Beats', `<a href="#/telugu">See All ${ICON.chev}</a>`) + `<div class="shelf">${items.map(cardHtml).join('')}</div>`;
+    }).catch(() => {});
+  } catch { view.innerHTML = page('<div class="lt">Home</div>' + offlineMsg()); }
 }
+const offlineMsg = () => DL && DL.list().length
+  ? `<div class="empty"><b>You’re offline</b>Your ${DL.list().length} downloaded song${DL.list().length === 1 ? '' : 's'} still play.<div class="btns"><a class="pill solid" href="#/library" onclick="libTab='downloads'">Go to Downloads</a></div></div>`
+  : '<div class="empty"><b>Can’t connect</b>Check your internet connection and try again.</div>';
 async function renderNew() {
   if (!exploreCache) view.innerHTML = page(`<div class="lt">New</div>${skShelf(6)}`);
   try {
@@ -676,7 +809,7 @@ function renderSearch() {
 }
 function browse() {
   const moods = (exploreCache?.moods?.length ? exploreCache.moods : FALLBACK_MOODS).slice(0, 24);
-  return head('Browse Categories', '', true) + '<div class="tiles">' + moods.map((m, i) =>
+  return head('Browse Categories', '', true) + '<div class="tiles"><button class="tile" data-go2="telugu" style="background:linear-gradient(135deg,#ff2d55,#ff9500)">Telugu Beats</button>' + moods.map((m, i) =>
     `<button class="tile" data-q="${esc(m)} music" style="background:linear-gradient(135deg,${TILE_COLORS[i % TILE_COLORS.length]})">${esc(m)}</button>`).join('') + '</div>';
 }
 async function doSearch(q) {
@@ -696,15 +829,19 @@ async function doSearch(q) {
 }
 let libTab = 'songs';
 function renderLib() {
-  const list = libTab === 'songs' ? liked : recent;
+  if (libTab === 'downloads' && !DL) libTab = 'songs';
+  const list = libTab === 'songs' ? liked : libTab === 'downloads' ? DL.list() : recent;
   const empty = libTab === 'songs'
     ? '<div class="empty"><b>No Loved Songs yet</b>Tap ♥ on any song to save it here.</div>'
+    : libTab === 'downloads'
+    ? '<div class="empty"><b>No downloads yet</b>Tap ••• on any song and choose Download to listen without internet.</div>'
     : '<div class="empty"><b>Nothing played yet</b>Songs you play will appear here.</div>';
   view.innerHTML = page(`<div class="lt">Library</div>
-    <div class="seg"><button data-t="songs" class="${libTab === 'songs' ? 'on' : ''}">Loved Songs</button><button data-t="recent" class="${libTab === 'recent' ? 'on' : ''}">Recently Played</button></div>
-    ${list.length ? `<div class="btns" style="margin:0 0 18px"><button class="pill" id="pa"><svg viewBox="0 0 24 24">${ICON.play}</svg>Play</button><button class="pill" id="sa"><svg viewBox="0 0 24 24"><path d="M14.8 4H20v5.2l-1.9-1.9L5.4 20 4 18.6 16.7 5.9zM4 5.4 5.4 4l5.1 5.1-1.4 1.4zm11.2 10.2 1.4-1.4 1.5 1.5L20 14v6h-6l1.8-1.8z"/></svg>Shuffle</button></div>` : ''}
+    <div class="seg"><button data-t="songs" class="${libTab === 'songs' ? 'on' : ''}">Loved Songs</button><button data-t="recent" class="${libTab === 'recent' ? 'on' : ''}">Recent</button>${DL ? `<button data-t="downloads" class="${libTab === 'downloads' ? 'on' : ''}">Downloaded</button>` : ''}</div>
+    ${list.length ? `<div class="btns" style="margin:0 0 18px"><button class="pill" id="pa"><svg viewBox="0 0 24 24">${ICON.play}</svg>Play</button><button class="pill" id="sa"><svg viewBox="0 0 24 24"><path d="M14.8 4H20v5.2l-1.9-1.9L5.4 20 4 18.6 16.7 5.9zM4 5.4 5.4 4l5.1 5.1-1.4 1.4zm11.2 10.2 1.4-1.4 1.5 1.5L20 14v6h-6l1.8-1.8z"/></svg>Shuffle</button>${DL && libTab === 'songs' ? `<button class="pill icon" id="dla" aria-label="Download all">${ICON.download}</button>` : ''}</div>` : ''}
     ${rows(list) || empty}
-    ${list.length ? `<div class="foot">${list.length} song${list.length === 1 ? '' : 's'} · stored only on this device</div>` : ''}`);
+    ${list.length ? `<div class="foot">${list.length} song${list.length === 1 ? '' : 's'} · ${libTab === 'downloads' ? mb(DL.bytes()) + ' on this iPhone · plays without internet' : 'stored only on this device'}</div>` : ''}`);
+  const dla = $('#dla'); if (dla) dla.onclick = async () => { const n = await DL.downloadMany(liked); toast(n ? `Downloading ${n} song${n === 1 ? '' : 's'}…` : 'All Loved Songs are downloaded', ICON.download); };
   $$('.seg button').forEach(b => b.onclick = () => { libTab = b.dataset.t; renderLib(); });
   if (list.length) { $('#pa').onclick = () => playList(list, 0, false); $('#sa').onclick = () => playList([...list].sort(() => Math.random() - .5), 0, false); }
   markCurrent();
@@ -718,11 +855,12 @@ async function renderCollection(kind, id) {
     view.innerHTML = page(`<div class="hero"><img src="${esc(c.art)}" alt=""><div class="meta"><h1>${esc(c.title)}</h1>
       <div class="by">${esc(c.artist) || (kind === 'playlist' ? 'Playlist' : '')}</div>
       <div class="info">${kind}${c.year ? ' · ' + esc(c.year) : ''}</div>
-      <div class="btns"><button class="pill" id="pa"><svg viewBox="0 0 24 24">${ICON.play}</svg>Play</button><button class="pill" id="sa"><svg viewBox="0 0 24 24"><path d="M14.8 4H20v5.2l-1.9-1.9L5.4 20 4 18.6 16.7 5.9zM4 5.4 5.4 4l5.1 5.1-1.4 1.4zm11.2 10.2 1.4-1.4 1.5 1.5L20 14v6h-6l1.8-1.8z"/></svg>Shuffle</button></div></div></div>`
+      <div class="btns"><button class="pill" id="pa"><svg viewBox="0 0 24 24">${ICON.play}</svg>Play</button><button class="pill" id="sa"><svg viewBox="0 0 24 24"><path d="M14.8 4H20v5.2l-1.9-1.9L5.4 20 4 18.6 16.7 5.9zM4 5.4 5.4 4l5.1 5.1-1.4 1.4zm11.2 10.2 1.4-1.4 1.5 1.5L20 14v6h-6l1.8-1.8z"/></svg>Shuffle</button>${DL ? `<button class="pill icon" id="dla" aria-label="Download">${ICON.download}</button>` : ''}</div></div></div>`
       + rows(c.tracks, { numbered: kind === 'album' })
       + `<div class="foot">${c.tracks.length} song${c.tracks.length === 1 ? '' : 's'}${mins ? `, ${mins} minutes` : ''}</div>`);
     $('#pa').onclick = () => playList(c.tracks, 0);
     $('#sa').onclick = () => { setShuffle(false); playList([...c.tracks].sort(() => Math.random() - .5), 0); };
+    const dla = $('#dla'); if (dla) dla.onclick = async () => { const n = await DL.downloadMany(c.tracks); toast(n ? `Downloading ${n} song${n === 1 ? '' : 's'}…` : 'Already downloaded', ICON.download); };
     markCurrent();
   } catch { view.innerHTML = page('<div class="empty"><b>Couldn’t load this</b>Check your connection and try again.</div>'); }
 }
@@ -742,11 +880,12 @@ function route() {
   if (a === 'search') renderSearch();
   else if (a === 'library' || a === 'recent') renderLib();
   else if (a === 'new') renderNew();
+  else if (a === 'telugu') renderTelugu();
   else if (a === 'album' || a === 'playlist') renderCollection(a, decodeURIComponent(b));
   else renderHome();
 }
 $$('[data-go]').forEach(n => n.onclick = () => {
-  if (n.dataset.go === 'library') libTab = 'songs';
+  if (n.dataset.go === 'library' && libTab !== 'downloads') libTab = 'songs';
   const h = '#/' + n.dataset.go; if (location.hash === h) { view.scrollTo({ top: 0 }); if (h === '#/search') $('#q')?.focus(); } else location.hash = h;
 });
 window.addEventListener('hashchange', route);
