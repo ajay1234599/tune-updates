@@ -1,0 +1,8 @@
+{
+ "build": 202611222346,
+ "files": {
+  "app-bridge.js": "9c0a031f8aa9ac33d06c1e28c46ec430b5955b9afd27bc6a88780d6343b6f518",
+  "engine.js": "d4b65ef78f28dda7f519ba1945de7e57452e227b5ca19cecbd24825cc092fdd5",
+  "index.html": "51995e990757b8a8e69371cb06b12d8dc865981fac2e220f9d3af6fd12cda027"
+ }
+}
